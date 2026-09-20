@@ -32,6 +32,7 @@ export function ProjectForm() {
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [reference, setReference] = useState("");
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const startedAt = useRef<number | null>(null);
   const progress = useMemo(() => (step / 3) * 100, [step]);
@@ -44,7 +45,7 @@ export function ProjectForm() {
     body.set("source", "website-project-enquiry");
     if (file && file.size) body.set("attachment", file);
     const response = await fetch("/api/inquiries", { method: "POST", body });
-    const result = await response.json() as { ok?: boolean; reference?: string; message?: string };
+    const result = await response.json() as { ok?: boolean; reference?: string; message?: string; notifications?: { confirmationSent?: boolean } };
     if (!response.ok || !result.ok) throw new Error(result.message || "We could not send your enquiry.");
     return result;
   }
@@ -56,6 +57,7 @@ export function ProjectForm() {
     try {
       const result = await send(draft, fileRef.current?.files?.[0]);
       setReference(result.reference || "Received");
+      setConfirmationSent(Boolean(result.notifications?.confirmationSent));
       setStatus("success");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "We could not send your enquiry.");
@@ -77,7 +79,7 @@ export function ProjectForm() {
       execute: async (input: unknown) => {
         const payload = { ...initial, ...(input as Partial<ProjectDraft>) };
         setDraft(payload); setStep(3); setStatus("submitting");
-        const result = await send(payload); setReference(result.reference || "Received"); setStatus("success");
+        const result = await send(payload); setReference(result.reference || "Received"); setConfirmationSent(Boolean(result.notifications?.confirmationSent)); setStatus("success");
         return { status: "received", reference: result.reference };
       },
     }, { signal: lifecycle.signal })).catch(() => undefined);
@@ -85,7 +87,7 @@ export function ProjectForm() {
   }, []);
 
   if (status === "success") {
-    return <div className="form-success"><span><Check size={24} /></span><p className="eyebrow">Enquiry received</p><h2>Thank you. We’ll review the brief and respond with the right next step.</h2><p>Your reference is <strong>{reference}</strong>. Keep it if you need to follow up.</p><Link className="button button-dark" href="/">Return to the homepage</Link></div>;
+    return <div className="form-success"><span><Check size={24} /></span><p className="eyebrow">Enquiry received</p><h2>Thank you. We’ll review the brief and respond with the right next step.</h2><p>Your reference is <strong>{reference}</strong>. Keep it if you need to follow up.</p>{confirmationSent && <p>A confirmation has been sent to <strong>{draft.email}</strong>.</p>}<Link className="button button-dark" href="/">Return to the homepage</Link></div>;
   }
 
   return (

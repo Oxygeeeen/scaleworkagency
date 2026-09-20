@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/db";
 import { inquiries } from "@/db/schema";
+import { sendSubmissionEmails, type SubmissionEmailResult } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -66,13 +67,21 @@ export async function POST(request: Request) {
     if (file instanceof File && file.size && !allowed.has(file.type)) {
       return NextResponse.json({ ok: false, message: "Use PDF, DOCX, CSV or TXT for attachments." }, { status: 400 });
     }
+    if (!process.env.DATABASE_URL || (file instanceof File && file.size && !process.env.BLOB_READ_WRITE_TOKEN)) {
+      return NextResponse.json({
+        ok: false,
+        message: "Project enquiries are not configured yet. Please email hello@scaleworkagency.com while we finish the secure submission setup.",
+      }, { status: 503 });
+    }
 
     const db = getDb();
     const id = crypto.randomUUID();
     const reference = `SWA-${id.slice(0, 8).toUpperCase()}`;
     let attachmentKey: string | null = null;
+    let emailAttachment: { filename: string; content: Buffer; contentType: string } | undefined;
 
     if (file instanceof File && file.size) {
+      emailAttachment = { filename: file.name, content: Buffer.from(await file.arrayBuffer()), contentType: file.type };
       const blob = await put(`inquiries/${id}/${safeFilename(file.name)}`, file, {
         access: "private",
         addRandomSuffix: true,
@@ -101,7 +110,36 @@ export async function POST(request: Request) {
       createdAt: new Date(),
     });
 
-    return NextResponse.json({ ok: true, reference });
+    let notifications: SubmissionEmailResult = { configured: false, confirmationSent: false, adminSent: false };
+    try {
+      notifications = await sendSubmissionEmails({
+        kind: "project",
+        reference,
+        recipientName: parsed.data.name,
+        recipientEmail: parsed.data.email,
+        headline: `${parsed.data.company} · ${parsed.data.projectType}`,
+        message: parsed.data.details,
+        details: [
+          { label: "Contact", value: parsed.data.name },
+          { label: "Email", value: parsed.data.email },
+          { label: "Company", value: parsed.data.company },
+          { label: "Role", value: parsed.data.role },
+          { label: "Project type", value: parsed.data.projectType },
+          { label: "Expertise", value: parsed.data.expertise },
+          { label: "Languages", value: parsed.data.languages },
+          { label: "Expected volume", value: parsed.data.volume },
+          { label: "Timeline", value: parsed.data.timeline },
+          { label: "Data sensitivity", value: parsed.data.sensitivity },
+          { label: "Budget", value: parsed.data.budget },
+          { label: "Attached brief", value: file instanceof File && file.size ? file.name : null },
+        ],
+        attachment: emailAttachment,
+      });
+    } catch (emailError) {
+      console.error("Project enquiry saved but email preparation failed", emailError);
+    }
+
+    return NextResponse.json({ ok: true, reference, notifications });
   } catch (error) {
     if (uploadedUrl) await del(uploadedUrl).catch(() => undefined);
     console.error("Project enquiry failed", error);

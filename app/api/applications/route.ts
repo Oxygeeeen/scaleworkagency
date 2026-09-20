@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/db";
 import { applications } from "@/db/schema";
+import { sendSubmissionEmails, type SubmissionEmailResult } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -66,10 +67,17 @@ export async function POST(request: Request) {
     if (!allowed.has(file.type)) {
       return NextResponse.json({ ok: false, message: "Upload your CV as a PDF or DOCX file." }, { status: 400 });
     }
+    if (!process.env.DATABASE_URL || !process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json({
+        ok: false,
+        message: "Applications are not configured yet. Please email hello@scaleworkagency.com while we finish the secure submission setup.",
+      }, { status: 503 });
+    }
 
     const db = getDb();
     const id = crypto.randomUUID();
     const reference = `TRAIN-${id.slice(0, 8).toUpperCase()}`;
+    const cvContent = Buffer.from(await file.arrayBuffer());
     const blob = await put(`applications/${id}/${safeFilename(file.name)}`, file, {
       access: "private",
       addRandomSuffix: true,
@@ -95,7 +103,35 @@ export async function POST(request: Request) {
       createdAt: new Date(),
     });
 
-    return NextResponse.json({ ok: true, reference });
+    let notifications: SubmissionEmailResult = { configured: false, confirmationSent: false, adminSent: false };
+    try {
+      notifications = await sendSubmissionEmails({
+        kind: "application",
+        reference,
+        recipientName: parsed.data.name,
+        recipientEmail: parsed.data.email,
+        headline: "New AI trainer application",
+        message: parsed.data.experience,
+        details: [
+          { label: "Applicant", value: parsed.data.name },
+          { label: "Email", value: parsed.data.email },
+          { label: "Country / region", value: parsed.data.country },
+          { label: "Languages", value: parsed.data.languages },
+          { label: "Discipline", value: parsed.data.discipline },
+          { label: "Education", value: parsed.data.education },
+          { label: "Coding languages", value: parsed.data.coding },
+          { label: "Availability", value: parsed.data.availability },
+          { label: "Professional profile", value: parsed.data.profileUrl },
+          { label: "Additional note", value: parsed.data.note },
+          { label: "CV", value: file.name },
+        ],
+        attachment: { filename: file.name, content: cvContent, contentType: file.type },
+      });
+    } catch (emailError) {
+      console.error("Application saved but email preparation failed", emailError);
+    }
+
+    return NextResponse.json({ ok: true, reference, notifications });
   } catch (error) {
     if (uploadedUrl) await del(uploadedUrl).catch(() => undefined);
     console.error("Trainer application failed", error);

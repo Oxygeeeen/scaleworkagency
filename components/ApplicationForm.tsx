@@ -16,6 +16,7 @@ export function ApplicationForm() {
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [reference, setReference] = useState("");
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const cvRef = useRef<HTMLInputElement>(null);
   const startedAt = useRef<number | null>(null);
   const update = (name: keyof ApplicationDraft, value: string) => setDraft((current) => ({ ...current, [name]: value }));
@@ -25,7 +26,7 @@ export function ApplicationForm() {
     body.set("startedAt", String(startedAt.current ?? Date.now())); body.set("source", "website-trainer-application");
     if (file && file.size) body.set("cv", file);
     const response = await fetch("/api/applications", { method: "POST", body });
-    const result = await response.json() as { ok?: boolean; reference?: string; message?: string };
+    const result = await response.json() as { ok?: boolean; reference?: string; message?: string; notifications?: { confirmationSent?: boolean } };
     if (!response.ok || !result.ok) throw new Error(result.message || "We could not send your application.");
     return result;
   }
@@ -34,7 +35,7 @@ export function ApplicationForm() {
     event.preventDefault();
     if (!consent) { toast.error("Please confirm the application declarations."); return; }
     setStatus("submitting");
-    try { const result = await send(draft, cvRef.current?.files?.[0]); setReference(result.reference || "Received"); setStatus("success"); }
+    try { const result = await send(draft, cvRef.current?.files?.[0]); setReference(result.reference || "Received"); setConfirmationSent(Boolean(result.notifications?.confirmationSent)); setStatus("success"); }
     catch (error) { toast.error(error instanceof Error ? error.message : "We could not send your application."); setStatus("idle"); }
   }
 
@@ -43,11 +44,11 @@ export function ApplicationForm() {
     const context = (document as Document & { modelContext?: { registerTool?: (tool: unknown, options?: { signal?: AbortSignal }) => unknown } }).modelContext;
     if (!context?.registerTool) return;
     const lifecycle = new AbortController();
-    void Promise.resolve(context.registerTool({ name: "submit_ai_trainer_application", title: "Submit AI trainer application", description: "Submit an application for managed freelance AI training assignments.", inputSchema: { type: "object", additionalProperties: false, required: ["name", "email", "country", "languages", "discipline", "experience", "availability"], properties: Object.fromEntries(Object.keys(initial).map((key) => [key, { type: "string" }])) }, annotations: { readOnlyHint: false, untrustedContentHint: false }, execute: async (input: unknown) => { const payload = { ...initial, ...(input as Partial<ApplicationDraft>) }; setDraft(payload); setStatus("submitting"); const result = await send(payload); setReference(result.reference || "Received"); setStatus("success"); return { status: "received", reference: result.reference }; } }, { signal: lifecycle.signal })).catch(() => undefined);
+    void Promise.resolve(context.registerTool({ name: "submit_ai_trainer_application", title: "Submit AI trainer application", description: "Submit an application for managed freelance AI training assignments.", inputSchema: { type: "object", additionalProperties: false, required: ["name", "email", "country", "languages", "discipline", "experience", "availability"], properties: Object.fromEntries(Object.keys(initial).map((key) => [key, { type: "string" }])) }, annotations: { readOnlyHint: false, untrustedContentHint: false }, execute: async (input: unknown) => { const payload = { ...initial, ...(input as Partial<ApplicationDraft>) }; setDraft(payload); setStatus("submitting"); const result = await send(payload); setReference(result.reference || "Received"); setConfirmationSent(Boolean(result.notifications?.confirmationSent)); setStatus("success"); return { status: "received", reference: result.reference }; } }, { signal: lifecycle.signal })).catch(() => undefined);
     return () => lifecycle.abort();
   }, []);
 
-  if (status === "success") return <div className="form-success"><span><Check size={24} /></span><p className="eyebrow">Application received</p><h2>Thank you for applying.</h2><p>We’ll review your experience against current and upcoming project needs. Your reference is <strong>{reference}</strong>.</p><Link className="button button-dark" href="/freelancers">Return to freelancer information</Link></div>;
+  if (status === "success") return <div className="form-success"><span><Check size={24} /></span><p className="eyebrow">Application received</p><h2>Thank you for applying.</h2><p>We’ll review your experience against current and upcoming project needs. Your reference is <strong>{reference}</strong>.</p>{confirmationSent && <p>A confirmation has been sent to <strong>{draft.email}</strong>.</p>}<Link className="button button-dark" href="/freelancers">Return to freelancer information</Link></div>;
 
   return <form className="application-form" onSubmit={submit}><Toaster position="top-center" /><div className="application-form-head"><p className="eyebrow">Application</p><h2>Tell us where your expertise is strongest.</h2><p>Applying does not guarantee an assignment. Selection depends on project demand, assessment results and successful onboarding.</p></div><div className="form-grid form-grid-two">
     <label className="field"><span>Full name <b>*</b></span><input required value={draft.name} onChange={(e) => update("name", e.target.value)} /></label>
