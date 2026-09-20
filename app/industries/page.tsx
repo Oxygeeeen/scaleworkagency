@@ -1,0 +1,9 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight, Check } from "lucide-react";
+import { PageIntro, SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { industries } from "@/lib/site-data";
+
+export const metadata: Metadata = { title: "Industries and AI Use Cases", description: "Specialist human evaluation and training data for generative AI, software engineering, language, mathematics, support automation and safety." };
+
+export default function IndustriesPage() { return <main><SiteHeader /><PageIntro eyebrow="Industries" title="Specialist work deserves specialist judgment." text="We focus on AI use cases where language, technical knowledge or safety context materially changes what good data looks like." /><section className="section industry-directory">{industries.map((item, index) => <article key={item.title}><span>0{index + 1}</span><h2>{item.title}</h2><p>{item.text}</p><ul>{[["Evaluation rubrics", "Expert contributors", "Reviewed outputs"], ["Code execution", "Debugging", "Test creation"], ["Local context", "Fluency checks", "Multilingual safety"], ["Verified solutions", "Difficulty grading", "Error analysis"], ["Intent and tone", "Policy adherence", "Conversation quality"], ["Adversarial prompts", "Failure taxonomy", "Severity review"]][index].map((point) => <li key={point}><Check size={15} /> {point}</li>)}</ul></article>)}</section><section className="simple-cta"><div><p className="eyebrow eyebrow-light">Need another specialist domain?</p><h2>We confirm capability before we make a claim.</h2><p>Share the exact expertise, language and review level. We’ll assess the contributor profile and operating requirements.</p></div><Link className="button button-light" href="/contact">Discuss specialist requirements <ArrowRight size={17} /></Link></section><SiteFooter /></main>; }

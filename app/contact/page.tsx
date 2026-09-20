@@ -1,0 +1,7 @@
+import type { Metadata } from "next";
+import { CalendarCheck2, FileLock2, MessagesSquare, Route } from "lucide-react";
+import { ProjectForm } from "@/components/ProjectForm";
+import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+
+export const metadata: Metadata = { title: "Request a Consultation", description: "Tell ScaleWorkAgency about your AI training data, evaluation, annotation or specialist workforce project." };
+export default function ContactPage() { return <main><SiteHeader /><section className="contact-layout"><aside><p className="eyebrow eyebrow-light">Discuss a project</p><h1>Start with the outcome—not a fully formed specification.</h1><p>Share what you know about the model, the data and the decision you need to make. We’ll use it to structure a productive first conversation.</p><div className="contact-steps"><article><MessagesSquare size={20} /><div><strong>1. We review the brief</strong><span>A delivery lead checks fit, risk and missing information.</span></div></article><article><CalendarCheck2 size={20} /><div><strong>2. We arrange the right discussion</strong><span>Relevant project stakeholders join the consultation.</span></div></article><article><Route size={20} /><div><strong>3. We recommend a next step</strong><span>Discovery, pilot or a managed programme proposal.</span></div></article></div><span className="privacy-note"><FileLock2 size={17} /> Do not attach production data, credentials or highly sensitive information at this stage.</span></aside><ProjectForm /></section><SiteFooter /></main>; }
