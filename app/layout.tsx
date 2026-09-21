@@ -32,6 +32,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     name: "ScaleWorkAgency",
     url: siteUrl.toString(),
     description: "Managed human expertise for training, evaluating and improving artificial intelligence systems.",
+    sameAs: ["https://twitter.com/scaleworkagency"],
   };
   return <html lang="en" data-scroll-behavior="smooth"><body>{children}<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body></html>;
 }

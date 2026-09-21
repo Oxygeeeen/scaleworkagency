@@ -39,6 +39,7 @@ function safeHeader(value: string) {
 
 function emailShell(preheader: string, content: string) {
   const siteUrl = getSiteUrl().origin;
+  const logoUrl = `${siteUrl}/email-logo.png`;
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -54,19 +55,28 @@ function emailShell(preheader: string, content: string) {
       }
     </style>
   </head>
-  <body style="margin:0;padding:0;background:#f1f0eb;color:#101726;font-family:Inter,Arial,sans-serif;">
+  <body style="margin:0;padding:0;background:#f5f3ee;color:#0a1020;font-family:Inter,Arial,sans-serif;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(preheader)}</div>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f1f0eb;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f3ee;">
       <tr><td align="center" style="padding:36px 14px;">
-        <table role="presentation" class="email-wrap" width="620" cellspacing="0" cellpadding="0" style="width:620px;max-width:620px;background:#ffffff;border:1px solid #dcded9;border-radius:24px;overflow:hidden;box-shadow:0 18px 50px rgba(16,23,38,.08);">
-          <tr><td class="email-pad" style="padding:26px 38px;background:#0c1424;color:#ffffff;">
-            <a href="${escapeHtml(siteUrl)}" style="color:#ffffff;text-decoration:none;font-size:21px;font-weight:800;letter-spacing:-.7px;">ScaleWork<span style="color:#82d9f5;">Agency</span></a>
-            <div style="margin-top:9px;color:#aab4c8;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Human intelligence for better AI</div>
+        <table role="presentation" class="email-wrap" width="620" cellspacing="0" cellpadding="0" style="width:620px;max-width:620px;background:#ffffff;border:1px solid #dcdad4;border-radius:24px;overflow:hidden;box-shadow:0 18px 50px rgba(10,16,32,.09);">
+          <tr><td class="email-pad" style="padding:24px 38px;background:#0a1020;color:#ffffff;border-bottom:4px solid #c6f56b;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="58" valign="middle">
+                  <a href="${escapeHtml(siteUrl)}" style="display:inline-block;text-decoration:none;"><img src="${escapeHtml(logoUrl)}" width="46" height="46" alt="" style="display:block;width:46px;height:46px;border:0;border-radius:12px;"></a>
+                </td>
+                <td valign="middle">
+                  <a href="${escapeHtml(siteUrl)}" style="color:#ffffff;text-decoration:none;font-size:21px;font-weight:800;letter-spacing:-.7px;">ScaleWork<span style="color:#c6f56b;">Agency</span></a>
+                  <div style="margin-top:7px;color:#bdc6d9;font-size:10px;font-weight:700;letter-spacing:1.45px;text-transform:uppercase;">Human intelligence for better AI</div>
+                </td>
+              </tr>
+            </table>
           </td></tr>
           ${content}
-          <tr><td class="email-pad" style="padding:23px 38px;background:#f8f8f5;border-top:1px solid #e5e6e1;color:#687083;font-size:12px;line-height:1.7;">
-            ScaleWorkAgency · Managed AI training data services<br>
-            <a href="mailto:${defaultAdminEmail}" style="color:#101726;text-decoration:none;font-weight:700;">${defaultAdminEmail}</a>
+          <tr><td class="email-pad" style="padding:25px 38px;background:#0a1020;border-top:1px solid #202a40;color:#aeb7ca;font-size:12px;line-height:1.7;">
+            <strong style="color:#ffffff;">ScaleWorkAgency</strong> · Managed AI training data services<br>
+            <a href="mailto:${defaultAdminEmail}" style="color:#c6f56b;text-decoration:none;font-weight:700;">${defaultAdminEmail}</a>
           </td></tr>
         </table>
       </td></tr>
@@ -76,9 +86,9 @@ function emailShell(preheader: string, content: string) {
 }
 
 function referenceCard(reference: string) {
-  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:26px 0;background:#eef8fb;border:1px solid #ccebf5;border-radius:14px;">
-    <tr><td style="padding:17px 20px;color:#456070;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;">Submission reference</td>
-    <td align="right" style="padding:17px 20px;color:#0c1424;font-size:15px;font-weight:800;">${escapeHtml(reference)}</td></tr>
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:26px 0;background:#e8efff;border:1px solid #c8d8ff;border-radius:14px;">
+    <tr><td style="padding:17px 20px;color:#47628f;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;">Submission reference</td>
+    <td align="right" style="padding:17px 20px;color:#0a1020;font-size:15px;font-weight:800;">${escapeHtml(reference)}</td></tr>
   </table>`;
 }
 
@@ -94,16 +104,16 @@ function confirmationHtml(input: SubmissionEmailInput) {
 
   return emailShell(title, `
     <tr><td class="email-pad" style="padding:42px 38px 18px;">
-      <div style="display:inline-block;padding:7px 10px;border-radius:999px;background:#eff7f4;color:#2f6c5b;font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;">Received securely</div>
-      <h1 style="margin:20px 0 12px;color:#101726;font-size:34px;line-height:1.12;letter-spacing:-1.2px;">${title}</h1>
-      <p style="margin:0;color:#596275;font-size:16px;line-height:1.7;">Hello ${escapeHtml(input.recipientName)},</p>
-      <p style="margin:12px 0 0;color:#596275;font-size:16px;line-height:1.7;">${intro}</p>
+      <div style="display:inline-block;padding:7px 10px;border-radius:999px;background:#e8f8c8;color:#344b12;font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;">Received securely</div>
+      <h1 style="margin:20px 0 12px;color:#0a1020;font-size:34px;line-height:1.12;letter-spacing:-1.2px;">${title}</h1>
+      <p style="margin:0;color:#535e73;font-size:16px;line-height:1.7;">Hello ${escapeHtml(input.recipientName)},</p>
+      <p style="margin:12px 0 0;color:#535e73;font-size:16px;line-height:1.7;">${intro}</p>
       ${referenceCard(input.reference)}
-      <h2 style="margin:0 0 15px;color:#101726;font-size:17px;">What happens next</h2>
-      ${nextSteps.map((step, index) => `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 10px;"><tr><td width="34" valign="top"><span style="display:inline-block;width:26px;height:26px;border-radius:50%;background:#0c1424;color:#ffffff;text-align:center;line-height:26px;font-size:11px;font-weight:800;">${index + 1}</span></td><td style="padding:3px 0;color:#596275;font-size:14px;line-height:1.55;">${step}</td></tr></table>`).join("")}
+      <h2 style="margin:0 0 15px;color:#0a1020;font-size:17px;">What happens next</h2>
+      ${nextSteps.map((step, index) => `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 10px;"><tr><td width="34" valign="top"><span style="display:inline-block;width:26px;height:26px;border-radius:50%;background:#0a1020;color:#c6f56b;text-align:center;line-height:26px;font-size:11px;font-weight:800;">${index + 1}</span></td><td style="padding:3px 0;color:#535e73;font-size:14px;line-height:1.55;">${step}</td></tr></table>`).join("")}
     </td></tr>
     <tr><td class="email-pad" style="padding:12px 38px 42px;">
-      <div style="padding:18px 20px;background:#f8f8f5;border-radius:14px;color:#687083;font-size:13px;line-height:1.65;">Please keep your reference for any follow-up. You can reply directly to this email if you need to add context.</div>
+      <div style="padding:18px 20px;background:#f5f3ee;border:1px solid #e4e1d9;border-radius:14px;color:#606a7d;font-size:13px;line-height:1.65;">Please keep your reference for any follow-up. You can reply directly to this email if you need to add context.</div>
     </td></tr>`);
 }
 
@@ -111,25 +121,25 @@ function adminHtml(input: SubmissionEmailInput) {
   const detailRows = input.details
     .filter((detail) => detail.value)
     .map((detail) => `<tr>
-      <td class="detail-label" width="38%" style="padding:11px 0;border-bottom:1px solid #ecece8;color:#72798a;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">${escapeHtml(detail.label)}</td>
-      <td class="detail-value" style="padding:11px 0;border-bottom:1px solid #ecece8;color:#101726;font-size:14px;line-height:1.55;text-align:right;">${escapeHtml(detail.value ?? "")}</td>
+      <td class="detail-label" width="38%" style="padding:11px 0;border-bottom:1px solid #e7e4dc;color:#6d7688;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">${escapeHtml(detail.label)}</td>
+      <td class="detail-value" style="padding:11px 0;border-bottom:1px solid #e7e4dc;color:#0a1020;font-size:14px;line-height:1.55;text-align:right;">${escapeHtml(detail.value ?? "")}</td>
     </tr>`).join("");
   const replySubject = encodeURIComponent(`Re: ${input.reference}`);
 
   return emailShell(input.headline, `
     <tr><td class="email-pad" style="padding:40px 38px 18px;">
-      <div style="display:inline-block;padding:7px 10px;border-radius:999px;background:#fff2d8;color:#7b5512;font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;">New website submission</div>
-      <h1 style="margin:20px 0 10px;color:#101726;font-size:31px;line-height:1.15;letter-spacing:-1px;">${escapeHtml(input.headline)}</h1>
-      <p style="margin:0;color:#687083;font-size:14px;line-height:1.65;">Reference <strong style="color:#101726;">${escapeHtml(input.reference)}</strong></p>
+      <div style="display:inline-block;padding:7px 10px;border-radius:999px;background:#ffdfbb;color:#69400c;font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;">New website submission</div>
+      <h1 style="margin:20px 0 10px;color:#0a1020;font-size:31px;line-height:1.15;letter-spacing:-1px;">${escapeHtml(input.headline)}</h1>
+      <p style="margin:0;color:#606a7d;font-size:14px;line-height:1.65;">Reference <strong style="color:#0a1020;">${escapeHtml(input.reference)}</strong></p>
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:25px 0 8px;">${detailRows}</table>
     </td></tr>
     <tr><td class="email-pad" style="padding:8px 38px 24px;">
-      <div style="margin-bottom:9px;color:#72798a;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;">Message</div>
-      <div style="padding:20px;background:#f4f6f7;border-left:4px solid #82d9f5;border-radius:0 14px 14px 0;color:#263146;font-size:14px;line-height:1.75;white-space:pre-wrap;">${escapeHtml(input.message)}</div>
+      <div style="margin-bottom:9px;color:#6d7688;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;">Message</div>
+      <div style="padding:20px;background:#f0f4ff;border-left:4px solid #98b8ff;border-radius:0 14px 14px 0;color:#253149;font-size:14px;line-height:1.75;white-space:pre-wrap;">${escapeHtml(input.message)}</div>
     </td></tr>
     <tr><td class="email-pad" style="padding:4px 38px 42px;">
-      <a href="mailto:${escapeHtml(input.recipientEmail)}?subject=${replySubject}" style="display:inline-block;padding:14px 20px;border-radius:999px;background:#0c1424;color:#ffffff;text-decoration:none;font-size:13px;font-weight:800;">Reply to ${escapeHtml(input.recipientName)}</a>
-      ${input.attachment ? `<div style="margin-top:16px;color:#687083;font-size:12px;">The submitted file is attached to this notification and stored securely with the submission.</div>` : ""}
+      <a href="mailto:${escapeHtml(input.recipientEmail)}?subject=${replySubject}" style="display:inline-block;padding:14px 20px;border-radius:999px;background:#c6f56b;color:#0a1020;text-decoration:none;font-size:13px;font-weight:800;">Reply to ${escapeHtml(input.recipientName)}</a>
+      ${input.attachment ? `<div style="margin-top:16px;color:#606a7d;font-size:12px;">The submitted file is attached to this notification and stored securely with the submission.</div>` : ""}
     </td></tr>`);
 }
 

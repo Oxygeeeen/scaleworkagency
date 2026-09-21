@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 type ApplicationDraft = { name: string; email: string; country: string; languages: string; education: string; discipline: string; coding: string; experience: string; availability: string; profileUrl: string; note: string };
 const initial: ApplicationDraft = { name: "", email: "", country: "", languages: "", education: "", discipline: "", coding: "", experience: "", availability: "", profileUrl: "", note: "" };
+const MIN_EXPERIENCE_LENGTH = 20;
 
 export function ApplicationForm() {
   const [draft, setDraft] = useState(initial);
@@ -17,8 +18,11 @@ export function ApplicationForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [reference, setReference] = useState("");
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [experienceTouched, setExperienceTouched] = useState(false);
   const cvRef = useRef<HTMLInputElement>(null);
   const startedAt = useRef<number | null>(null);
+  const experienceLength = draft.experience.trim().length;
+  const experienceError = experienceTouched && experienceLength < MIN_EXPERIENCE_LENGTH;
   const update = (name: keyof ApplicationDraft, value: string) => setDraft((current) => ({ ...current, [name]: value }));
 
   async function send(payload: ApplicationDraft, file?: File | null) {
@@ -33,6 +37,11 @@ export function ApplicationForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setExperienceTouched(true);
+    if (experienceLength < MIN_EXPERIENCE_LENGTH) {
+      toast.error(`Add at least ${MIN_EXPERIENCE_LENGTH} characters about your experience.`);
+      return;
+    }
     if (!consent) { toast.error("Please confirm the application declarations."); return; }
     setStatus("submitting");
     try { const result = await send(draft, cvRef.current?.files?.[0]); setReference(result.reference || "Received"); setConfirmationSent(Boolean(result.notifications?.confirmationSent)); setStatus("success"); }
@@ -59,5 +68,5 @@ export function ApplicationForm() {
     <label className="field"><span>Professional discipline <b>*</b></span><Select value={draft.discipline} onValueChange={(value) => value && update("discipline", String(value))}><SelectTrigger className="form-select"><SelectValue placeholder="Select your primary field" /></SelectTrigger><SelectContent>{["Software engineering", "Mathematics", "Language and translation", "Safety and policy", "Research", "Customer support", "Other professional field"].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent></Select></label>
     <label className="field"><span>Coding languages</span><input value={draft.coding} onChange={(e) => update("coding", e.target.value)} placeholder="If relevant" /></label>
     <label className="field"><span>Weekly availability <b>*</b></span><Select value={draft.availability} onValueChange={(value) => value && update("availability", String(value))}><SelectTrigger className="form-select"><SelectValue placeholder="Select availability" /></SelectTrigger><SelectContent>{["Under 10 hours", "10–20 hours", "20–30 hours", "30+ hours"].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent></Select></label>
-  </div><label className="field"><span>Relevant work experience <b>*</b></span><textarea required rows={5} value={draft.experience} onChange={(e) => update("experience", e.target.value)} placeholder="Describe the work that best demonstrates your expertise." /></label><div className="form-grid form-grid-two"><label className="field"><span>Portfolio or professional profile</span><input type="url" value={draft.profileUrl} onChange={(e) => update("profileUrl", e.target.value)} placeholder="https://" /></label><label className="upload-field compact"><FileText size={18} /><span><strong>Upload CV or résumé <b>*</b></strong><small>PDF or DOCX, up to 4 MB.</small></span><input ref={cvRef} required type="file" accept=".pdf,.doc,.docx" /></label></div><label className="field"><span>Anything else we should know?</span><textarea rows={3} value={draft.note} onChange={(e) => update("note", e.target.value)} /></label><div className="consent-row"><Checkbox id="application-consent" checked={consent} onCheckedChange={(value) => setConsent(Boolean(value))} /><label htmlFor="application-consent">I confirm this information is accurate and consent to its use for recruitment and project matching. I have read the <Link href="/legal/contributor-notice">contributor notice</Link>.</label></div><input className="honeypot" type="text" name="company_site" tabIndex={-1} autoComplete="off" aria-hidden="true" /><button className="button button-dark form-submit" disabled={status === "submitting"}>{status === "submitting" ? <LoaderCircle className="spin" size={18} /> : <Send size={18} />} Submit application</button></form>;
+  </div><label className={`field${experienceError ? " field-error" : ""}`}><span>Relevant work experience <b>*</b></span><textarea required minLength={MIN_EXPERIENCE_LENGTH} rows={5} value={draft.experience} onChange={(e) => update("experience", e.target.value)} onBlur={() => setExperienceTouched(true)} onInvalid={(event) => { event.preventDefault(); setExperienceTouched(true); }} aria-invalid={experienceError} aria-describedby="experience-guidance" placeholder="Describe the work that best demonstrates your expertise." /><span className="field-meta" id="experience-guidance"><small className={experienceError ? "field-message field-message-error" : "field-message"} role={experienceError ? "alert" : undefined}>{experienceError ? `Add ${MIN_EXPERIENCE_LENGTH - experienceLength} more character${MIN_EXPERIENCE_LENGTH - experienceLength === 1 ? "" : "s"} so we can assess your experience.` : "Share a concise example of relevant professional or specialist work."}</small><small className="field-counter">{experienceLength} / {MIN_EXPERIENCE_LENGTH} minimum</small></span></label><div className="form-grid form-grid-two"><label className="field"><span>Portfolio or professional profile</span><input type="url" value={draft.profileUrl} onChange={(e) => update("profileUrl", e.target.value)} placeholder="https://" /></label><label className="upload-field compact"><FileText size={18} /><span><strong>Upload CV or résumé <b>*</b></strong><small>PDF or DOCX, up to 4 MB.</small></span><input ref={cvRef} required type="file" accept=".pdf,.doc,.docx" /></label></div><label className="field"><span>Anything else we should know?</span><textarea rows={3} value={draft.note} onChange={(e) => update("note", e.target.value)} /></label><div className="consent-row"><Checkbox id="application-consent" checked={consent} onCheckedChange={(value) => setConsent(Boolean(value))} /><label htmlFor="application-consent">I confirm this information is accurate and consent to its use for recruitment and project matching. I have read the <Link href="/legal/contributor-notice">contributor notice</Link>.</label></div><input className="honeypot" type="text" name="company_site" tabIndex={-1} autoComplete="off" aria-hidden="true" /><button className="button button-dark form-submit" disabled={status === "submitting"}>{status === "submitting" ? <LoaderCircle className="spin" size={18} /> : <Send size={18} />} Submit application</button></form>;
 }

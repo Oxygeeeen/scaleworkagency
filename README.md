@@ -67,6 +67,20 @@ Both forms save the submission before attempting email delivery. The sender rece
 
 If a message is saved but email delivery fails, the form still returns a reference instead of creating a duplicate submission. The delivery failure is recorded in the Vercel Function logs for diagnosis.
 
+## Sender name and logo
+
+The email design and the sender image shown by an inbox are separate:
+
+- The branded logo inside each confirmation and admin notification is served from `/email-logo.png`. Set `NEXT_PUBLIC_SITE_URL` to the final production domain so email clients can load the image over HTTPS.
+- The inbox sender line comes from `EMAIL_FROM`. Keep it as `ScaleWorkAgency <hello@scaleworkagency.com>` after Resend verifies the domain.
+- A mailbox profile photo is controlled by the provider hosting `hello@scaleworkagency.com`. Add the project logo to that user in Google Workspace, Microsoft 365 or the relevant mailbox admin panel. This helps within that provider's ecosystem but does not guarantee an avatar for mail sent through Resend.
+- Cross-provider brand logos use BIMI. First confirm every legitimate sender for the domain has aligned SPF and DKIM, then move DMARC to enforcement (`p=quarantine` or `p=reject`, with `pct=100`) only after checking that valid mail will continue to pass. Do not publish multiple SPF records for the same hostname.
+- Prepare a separate square SVG Tiny PS logo for BIMI, obtain the CMC or VMC required by the receiving providers you want to support, and host the SVG and certificate at stable public HTTPS URLs.
+- Publish the final TXT record at `default._bimi.scaleworkagency.com`, using the URLs issued for the logo and certificate. A typical structure is `v=BIMI1; l=https://scaleworkagency.com/bimi-logo.svg; a=https://scaleworkagency.com/bimi-certificate.pem`.
+- Validate the BIMI and DMARC records, then send tests to several mailbox providers. The receiving provider ultimately decides whether and where to display the logo.
+
+Use the [BIMI Group implementation guide](https://bimigroup.org/implementation-guide/) and [Google Workspace BIMI requirements](https://support.google.com/a/answer/10911320?hl=en) while configuring DNS and certification. The website's PNG email logo is not a substitute for the BIMI SVG and certificate.
+
 ## Verify before pushing
 
 ```bash

@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, ChevronDown, ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, ArrowUpRight, ChevronDown, ShieldCheck } from "lucide-react";
 import { MobileMenu } from "@/components/MobileMenu";
 
 export function Brand({ inverse = false }: { inverse?: boolean }) {
   return (
     <Link className={`brand${inverse ? " brand-inverse" : ""}`} href="/" aria-label="ScaleWorkAgency home">
-      <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
+      <Image className="brand-logo" src="/favicon.svg" alt="" width={40} height={40} />
       <span>ScaleWork</span><em>Agency</em>
     </Link>
   );
@@ -14,7 +15,7 @@ export function Brand({ inverse = false }: { inverse?: boolean }) {
 export function SiteHeader({ inverse = false }: { inverse?: boolean }) {
   return (
     <header className={`site-header${inverse ? " header-inverse" : ""}`}>
-      <Brand inverse={inverse} />
+      <Brand inverse />
       <nav className="desktop-nav" aria-label="Primary navigation">
         <Link href="/services">Services <ChevronDown size={14} /></Link>
         <Link href="/how-it-works">How it works</Link>
@@ -23,7 +24,7 @@ export function SiteHeader({ inverse = false }: { inverse?: boolean }) {
       </nav>
       <div className="header-actions">
         <Link className="text-link" href="/freelancers">For freelancers</Link>
-        <Link className={`button button-small ${inverse ? "button-light" : "button-dark"}`} href="/contact">
+        <Link className="button button-small button-light" href="/contact">
           Discuss a project <ArrowRight size={15} />
         </Link>
         <MobileMenu />
@@ -47,7 +48,13 @@ export function SiteFooter() {
         <div><h3>Company</h3><Link href="/about">About</Link><Link href="/how-it-works">How it works</Link><Link href="/quality-security">Quality &amp; security</Link><Link href="/insights">Insights</Link></div>
         <div><h3>Contributors</h3><Link href="/freelancers">For freelancers</Link><Link href="/apply">Apply as an AI trainer</Link><Link href="/legal/contributor-notice">Contributor notice</Link></div>
       </div>
-      <div className="footer-bottom"><span>© 2026 ScaleWorkAgency</span><div><Link href="/legal/privacy">Privacy</Link><Link href="/legal/terms">Terms</Link><Link href="/legal/cookies">Cookies</Link></div></div>
+      <div className="footer-bottom">
+        <span>© 2026 ScaleWorkAgency</span>
+        <div className="footer-legal"><Link href="/legal/privacy">Privacy</Link><Link href="/legal/terms">Terms</Link><Link href="/legal/cookies">Cookies</Link></div>
+        <a className="footer-social-link" href="https://twitter.com/scaleworkagency" target="_blank" rel="noreferrer" aria-label="ScaleWorkAgency on Twitter">
+          Twitter <ArrowUpRight size={14} />
+        </a>
+      </div>
     </footer>
   );
 }

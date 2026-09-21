@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { ArrowRight, BarChart3, Braces, Check, ChevronRight, Languages, Pi, SearchCheck, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheck, Braces, BriefcaseBusiness, Check, ChevronRight, Languages, Pi, ScanSearch, SearchCheck, ShieldCheck, Sparkles } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { FaqBlock } from "@/components/FaqBlock";
 import { industries, insights, services } from "@/lib/site-data";
@@ -11,6 +11,8 @@ const homeFaq = [
   { question: "How do you handle sensitive data?", answer: "Controls are defined during scoping and may include restricted contributor selection, role-based access, confidentiality terms, minimum-access workflows, secure file exchange and retention rules." },
   { question: "Which languages and domains do you cover?", answer: "Coverage is confirmed for each project based on the exact level of proficiency or professional expertise required. We do not claim coverage until suitable contributors have been identified and qualified." },
 ];
+
+const insightIcons = [ScanSearch, BadgeCheck, BriefcaseBusiness];
 
 export default function Home() {
   return (
@@ -44,7 +46,7 @@ export default function Home() {
 
       <section className="freelancer-callout"><div className="freelancer-callout-image"><img src="/media/freelancer-night-work.jpg" alt="Freelance specialist working on a laptop" width="612" height="408" loading="lazy" decoding="async" /></div><div className="freelancer-callout-copy"><p className="eyebrow">For specialists</p><h2>Use your expertise to help improve AI.</h2><p>Join a selective contributor network for paid evaluation, annotation and expert-content assignments. Opportunities depend on project demand and qualification.</p><div><Link className="button button-dark" href="/apply">Apply as an AI trainer <ArrowRight size={17} /></Link><Link className="inline-link" href="/freelancers">How assignments work <ArrowRight size={16} /></Link></div></div></section>
 
-      <section className="section insights-section"><div className="section-heading"><div><p className="eyebrow">Field notes</p><h2>Practical thinking for AI data teams.</h2></div><Link className="inline-link" href="/insights">View all insights <ArrowRight size={16} /></Link></div><div className="insight-grid">{insights.map((article, index) => <Link key={article.slug} href={`/insights#${article.slug}`} className={`insight-card insight-card-${index + 1}`}><span>{article.category}</span><BarChart3 size={24} /><h3>{article.title}</h3><p>{article.excerpt}</p><small>6 min read <ArrowRight size={14} /></small></Link>)}</div></section>
+      <section className="section insights-section"><div className="section-heading"><div><p className="eyebrow">Field notes</p><h2>Practical thinking for AI data teams.</h2></div><Link className="inline-link" href="/insights">View all insights <ArrowRight size={16} /></Link></div><div className="insight-grid">{insights.map((article, index) => { const Icon = insightIcons[index] ?? ScanSearch; return <Link key={article.slug} href={`/insights#${article.slug}`} className={`insight-card insight-card-${index + 1}`}><span className="insight-category">{article.category}</span><span className="insight-icon" aria-hidden="true"><Icon size={25} strokeWidth={1.8} /></span><h3>{article.title}</h3><p>{article.excerpt}</p><small>{article.readTime} min read <ArrowRight size={14} /></small></Link>; })}</div></section>
       <FaqBlock items={homeFaq} />
       <SiteFooter />
     </main>

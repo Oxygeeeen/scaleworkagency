@@ -145,7 +145,7 @@ export const industries = [
 ];
 
 export const insights = [
-  { slug: "human-evaluation-ai-models", category: "Evaluation", title: "How human evaluation improves AI models", excerpt: "A practical look at rubrics, calibration and the signals model teams can actually use." },
-  { slug: "quality-control-data-annotation", category: "Quality", title: "Quality control for AI data annotation", excerpt: "Why good guidelines are only the beginning—and how review systems prevent drift." },
-  { slug: "selecting-training-data-partner", category: "Procurement", title: "Selecting an AI training data partner", excerpt: "The questions that reveal how a provider manages people, data, risk and accountability." },
+  { slug: "human-evaluation-ai-models", category: "Evaluation", readTime: 7, title: "How human evaluation improves AI models", excerpt: "A practical look at rubrics, calibration and the signals model teams can actually use."},
+  { slug: "quality-control-data-annotation", category: "Quality", readTime: 7, title: "Quality control for AI data annotation", excerpt: "Why good guidelines are only the beginning—and how review systems prevent drift." },
+  { slug: "selecting-training-data-partner", category: "Procurement", readTime: 6, title: "Selecting an AI training data partner", excerpt: "The questions that reveal how a provider manages people, data, risk and accountability." },
 ];
