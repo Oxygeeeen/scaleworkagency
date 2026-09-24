@@ -1,7 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ArrowUpRight, ChevronDown, ShieldCheck } from "lucide-react";
+import { ArrowRight, ChevronDown, ShieldCheck } from "lucide-react";
 import { MobileMenu } from "@/components/MobileMenu";
+
+function TwitterIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+      <path d="M23.95 4.57a10.1 10.1 0 0 1-2.83.78 4.93 4.93 0 0 0 2.17-2.72 9.9 9.9 0 0 1-3.13 1.2 4.92 4.92 0 0 0-8.52 3.37c0 .39.04.77.13 1.12A13.98 13.98 0 0 1 1.64 3.18a4.9 4.9 0 0 0 1.52 6.57 4.85 4.85 0 0 1-2.23-.62v.06a4.93 4.93 0 0 0 3.95 4.83 4.96 4.96 0 0 1-2.22.08 4.93 4.93 0 0 0 4.6 3.42A9.88 9.88 0 0 1 0 19.54a13.94 13.94 0 0 0 7.55 2.21c9.06 0 14.01-7.5 14.01-14.01 0-.21 0-.43-.02-.64a10 10 0 0 0 2.41-2.53Z" />
+    </svg>
+  );
+}
 
 export function Brand({ inverse = false }: { inverse?: boolean }) {
   return (
@@ -52,7 +60,7 @@ export function SiteFooter() {
         <span>© 2026 ScaleWorkAgency</span>
         <div className="footer-legal"><Link href="/legal/privacy">Privacy</Link><Link href="/legal/terms">Terms</Link><Link href="/legal/cookies">Cookies</Link></div>
         <a className="footer-social-link" href="https://twitter.com/scaleworkagency" target="_blank" rel="noreferrer" aria-label="ScaleWorkAgency on Twitter">
-          Twitter <ArrowUpRight size={14} />
+          <TwitterIcon />
         </a>
       </div>
     </footer>
